@@ -8,18 +8,20 @@ import 'package:trab/db/imagesController.dart';
 
 class NewImage extends StatefulWidget{
   //const NewImage({Key? key}) : super(key: key);
-  late final Uint8List bytes;
+  //late final Uint8List bytes;
+  late Uint8List bytes;
+  Image? _imgItem;
   NewImage(Uint8List b){
     this.bytes=b;
+    this._imgItem = Image.memory(this.bytes);
   }
 
   @override
-  _NewImageState createState() => _NewImageState(this.bytes);
+  _NewImageState createState() => _NewImageState();
 }
 
 class _NewImageState extends State<NewImage>{
-  late Uint8List bytes;
-  Image? _imgItem;
+  
 
   bool? _serviceEnabled;
   PermissionStatus? _permissionGranted;
@@ -72,11 +74,6 @@ class _NewImageState extends State<NewImage>{
     }); */
   }
 
-  _NewImageState(Uint8List b){
-    this.bytes = b;
-    _imgItem=Image.memory(bytes);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,8 +102,8 @@ class _NewImageState extends State<NewImage>{
         title: Text("Nova imagem"),
       ),
       body: Container(child: ListView(children: [
-          _imgItem == null? Text("No image!"):Container(
-            child: _imgItem!,
+          widget._imgItem == null? Text("No image!"):Container(
+            child: widget._imgItem!,
             margin: EdgeInsets.all(15),
           ),
           Container(
@@ -136,8 +133,8 @@ class _NewImageState extends State<NewImage>{
         heroTag: null,
         onPressed: () async {
           String d = DateTime.now().toString();
-          await _imagesController.insert(titleC.text, titleD.text, d, this._local == null ? 0.0 : this._local!.latitude!, this._local == null ? 0.0 : this._local!.longitude! , base64.encode(bytes));
-          Navigator.pop(context);
+          await _imagesController.insert(titleC.text, titleD.text, d, this._local == null ? 0.0 : this._local!.latitude!, this._local == null ? 0.0 : this._local!.longitude! , base64.encode(widget.bytes));
+          Navigator.pop(context,true);
         },
         child: Icon(Icons.save),
       ),

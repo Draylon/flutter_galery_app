@@ -12,23 +12,18 @@ class ViewImage extends StatefulWidget{
   }
 
   @override
-  _ViewImage createState() => _ViewImage(this._i);
+  _ViewImage createState() => _ViewImage();
 
 }
 
 class _ViewImage extends State<ViewImage>{
-  late int _i;
   bool _isLoading=true;
   ImagesController _imagesController = new ImagesController();
-  
-  _ViewImage(int ind){
-    this._i=ind;
-  }
 
   @override
     void initState() {
       super.initState();
-      loadID(this._i);
+      loadID(widget._i);
     }
   
 
@@ -36,7 +31,6 @@ class _ViewImage extends State<ViewImage>{
       return await _imagesController.queryID(i).whenComplete(() {
           setState(() {
               _isLoading = false;
-              print("loaded");
           });
       });
     }
@@ -76,7 +70,7 @@ class _ViewImage extends State<ViewImage>{
                 ElevatedButton(onPressed: () {
                   _imagesController.delete(0).then((value) {
                     Navigator.pop(ctx);
-                    Navigator.pop(context);
+                    Navigator.pop(context,true);
                   });
                 }, child: Text("Sim")),
                 ElevatedButton(onPressed: () {

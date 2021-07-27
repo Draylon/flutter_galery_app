@@ -39,6 +39,23 @@ class _HomeState extends State<Home> {
       duration: Duration(seconds:2),
     );
 
+    _newImage(XFile? image) async {
+      if(image != null){
+        final Uint8List bytes = await image.readAsBytes();
+        //Uint8List bytes = await FlutterImageCompress.compressWithList(bytes2,quality: 100,rotate: 0);
+        //final img2 = await FlutterExifRotation.rotateImage(path: image!.path);
+        //Uint8List bytes = await img2.readAsBytes();
+
+        final val = await Navigator.push(context, 
+        MaterialPageRoute(builder: (BuildContext c){
+          return new NewImage(bytes);
+        }));
+        if(val) loaded();
+      }else{
+        ScaffoldMessenger.of(context).showSnackBar(imageCanceled);
+      }
+    }
+
     @override
     Widget build(BuildContext context) {
         ImagePicker picker = ImagePicker();
@@ -61,20 +78,7 @@ class _HomeState extends State<Home> {
                     heroTag: null,
                     onPressed: () async {
                         final XFile? image = await picker.pickImage(source: ImageSource.camera,preferredCameraDevice: CameraDevice.rear);
-                        if(image != null){
-                          final Uint8List bytes = await image.readAsBytes();
-                          //Uint8List bytes = await FlutterImageCompress.compressWithList(bytes2,quality: 100,rotate: 0);
-                          //final img2 = await FlutterExifRotation.rotateImage(path: image!.path);
-                          //Uint8List bytes = await img2.readAsBytes();
-
-                          await Navigator.push(context, 
-                          MaterialPageRoute(builder: (BuildContext c){
-                            return new NewImage(bytes);
-                          }));
-                          loaded();
-                        }else{
-                          ScaffoldMessenger.of(context).showSnackBar(imageCanceled);
-                        }
+                        await _newImage(image);
                     },
                     tooltip: 'Tirar foto',
                     child: Icon(Icons.camera,size: 30,),
@@ -83,20 +87,7 @@ class _HomeState extends State<Home> {
                     heroTag: null,
                     onPressed: () async {
                         final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-                        if(image != null){
-                          final Uint8List bytes = await image.readAsBytes();
-                          //Uint8List bytes = await FlutterImageCompress.compressWithList(bytes2,quality: 100,rotate: 0);
-                          //final img2 = await FlutterExifRotation.rotateImage(path: image!.path);
-                          //Uint8List bytes = await img2.readAsBytes();
-
-                          await Navigator.push(context, 
-                          MaterialPageRoute(builder: (BuildContext c){
-                            return new NewImage(bytes);
-                          }));
-                          loaded();
-                        }else{
-                          ScaffoldMessenger.of(context).showSnackBar(imageCanceled);
-                        }
+                        await _newImage(image);
                     },
                     tooltip: 'Pegar na galeria',
                     child: Icon(Icons.photo_library_outlined,size: 30,),
@@ -122,11 +113,11 @@ class _HomeState extends State<Home> {
           child: Card(
               child: InkWell(
                   onTap: () async {
-                      await Navigator.push(context, 
+                      final val = await Navigator.push(context, 
                       MaterialPageRoute(builder: (BuildContext c) {
                         return new ViewImage(_imagesController.images[i].id!); 
                       }));
-                      loaded();
+                      if(val != null && val == true) loaded();
                   },
                   child: Ink(
                       child: Row(
